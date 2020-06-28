@@ -140,6 +140,12 @@ You set them in your Pelican configuration file.
     If you modify this setting in the Pelican configuration file it will
     completely replace the default extensions!
 
+*   ``PRECOMPRESS_MIN_SIZE`` (int, default is 20)
+
+    Small files tend to end up larger compressed than uncompressed, and any
+    improvement is likely to be marginal. The default setting is chosen to
+    avoid making files that are larger when compressed, but if you have a lot
+    of small files you may want to adjust this.
 
 Testing
 =======
