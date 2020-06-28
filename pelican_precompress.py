@@ -2,11 +2,14 @@
 # Copyright 2019-2020 Kurt McKee <contactme@kurtmckee.org>
 # Released under the MIT license.
 
+import multiprocessing
 import functools
 import logging
 import pathlib
+import hashlib
 from typing import Dict, Iterable, Set, Union
 import zlib
+import gzip
 
 __version__ = '1.0.0'
 
@@ -55,6 +58,10 @@ class FileSizeIncrease(Exception):
     """Indicate that the file size increased after compression."""
     pass
 
+def sha256(data):
+    m = hashlib.sha256()
+    m.update(data)
+    return m.hexdigest()
 
 def get_paths_to_compress(settings: Dict[str, pathlib.Path]) -> Iterable[pathlib.Path]:
     for path in pathlib.Path(settings['OUTPUT_PATH']).rglob('*'):
@@ -71,6 +78,7 @@ def get_settings(instance) -> Dict[str, Union[bool, pathlib.Path, Set[str]]]:
         'PRECOMPRESS_GZIP': instance.settings.get('PRECOMPRESS_GZIP', True),
         'PRECOMPRESS_ZOPFLI': instance.settings.get('PRECOMPRESS_ZOPFLI', bool(zopfli)),
         'PRECOMPRESS_OVERWRITE': instance.settings.get('PRECOMPRESS_OVERWRITE', False),
+        'PRECOMPRESS_MIN_SIZE': instance.settings.get('PRECOMPRESS_MIN_SIZE', 20),
         'PRECOMPRESS_TEXT_EXTENSIONS': set(
             instance.settings.get('PRECOMPRESS_TEXT_EXTENSIONS', DEFAULT_TEXT_EXTENSIONS)
         ),
@@ -127,30 +135,56 @@ def compress_files(instance):
         ('zopfli', compress_with_zopfli, settings['PRECOMPRESS_ZOPFLI'], '.gz'),
     )
 
+    pool = multiprocessing.Pool()
     for path in get_paths_to_compress(settings):
         with path.open('rb') as file:
             data = file.read()
 
-        for name, compress, enabled, extension in compressors:
-            if not enabled:
-                continue
+        for compressor in compressors:
+            # check if enabled
+            if compressor[2]:
+                pool.apply_async(worker, (data, path, compressor, settings))
 
-            # Do not overwrite existing files.
-            destination = path.with_name(path.name + extension)
-            if destination.exists():
-                if not settings['PRECOMPRESS_OVERWRITE']:
-                    log.info(f'{destination} already exists. Skipping.')
-                    continue
-                log.warning(f'{destination} exists and will be overwritten.')
+    pool.close()
+    pool.join()
 
-            try:
-                blob = compress(data)
-            except FileSizeIncrease:
-                log.info(f'{name} compression caused "{path}" to become larger. Skipping.')
-                continue
+def worker(data, path, compressor, settings):
+    (name, compress, enabled, extension) = compressor
 
-            with destination.open('wb') as file:
-                file.write(blob)
+    # don't bother trying to compress tiny files
+    min_size = settings['PRECOMPRESS_MIN_SIZE']
+    if len(data) < min_size:
+        log.info(f'{path} is less than {min_size} bytes. Skipping.')
+        return
+
+    # Do not overwrite existing files.
+    destination = path.with_name(path.name + extension)
+    if destination.exists():
+        if not settings['PRECOMPRESS_OVERWRITE']:
+            log.info(f'{destination} already exists. Skipping.')
+            return
+
+        # don't recompress if the input hasn't changed
+        (hash_orig, hash_dest) = (sha256(data), None)
+        if extension == '.gz':
+            hash_dest = sha256(gzip.open(destination).read())
+        elif extension == '.br':
+            hash_dest = sha256(brotli.decompress(open(destination, 'rb').read()))
+
+        if hash_orig == hash_dest:
+            log.info(f'{destination} exists with correct data. Skipping.')
+            return
+
+        log.warning(f'{destination} exists and will be overwritten.')
+
+    try:
+        blob = compress(data)
+    except FileSizeIncrease:
+        log.warning(f'{name} compression caused "{path}" to become larger ({len(data)} vs {len(blob)}). Skipping.')
+        return
+
+    with destination.open('wb') as file:
+        file.write(blob)
 
 
 def validate_file_sizes(wrapped):
