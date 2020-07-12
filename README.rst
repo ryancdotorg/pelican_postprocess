@@ -63,6 +63,7 @@ them alone because the defaults are awesome!
     # PRECOMPRESS_ZOPFLI = True or False
     # PRECOMPRESS_BROTLI = True or False
     # PRECOMPRESS_OVERWRITE = False
+    # PRECOMPRESS_MIN_SIZE = 20
     # PRECOMPRESS_TEXT_EXTENSIONS = {
     #     '.atom',
     #     '.css',
@@ -142,10 +143,13 @@ You set them in your Pelican configuration file.
 
 *   ``PRECOMPRESS_MIN_SIZE`` (int, default is 20)
 
-    Small files tend to end up larger compressed than uncompressed, and any
+    Small files tend to result in a larger file size when compressed, and any
     improvement is likely to be marginal. The default setting is chosen to
-    avoid making files that are larger when compressed, but if you have a lot
-    of small files you may want to adjust this.
+    avoid speculatively compressing files that are likely to result in a
+    larger file size after compression.
+
+    To try compressing every file regardless of size, set this to ``0``.
+
 
 Testing
 =======
