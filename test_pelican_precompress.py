@@ -147,6 +147,18 @@ def test_copyrights():
                 assert f'2019-{time.gmtime().tm_year}' in file.read(100), f'{path.name} has an incorrect copyright date'
 
 
+def apply_async_mock(fn, args, *extra_args, **kwargs):
+    """Act as a pass-through for multiprocessing.Pool.apply_async() calls."""
+
+    return fn(*args, *extra_args, **kwargs)
+
+
+multiprocessing_mock = Mock()
+multiprocessing_mock.Pool.return_value = multiprocessing_mock
+multiprocessing_mock.apply_async = apply_async_mock
+
+
+@patch('pelican_precompress.multiprocessing', multiprocessing_mock)
 def test_compress_files_do_nothing(fs):
     fs.create_file('/test.txt')
     instance = Mock()
@@ -161,6 +173,7 @@ def test_compress_files_do_nothing(fs):
     assert not pathlib.Path('/test.br').exists()
 
 
+@patch('pelican_precompress.multiprocessing', multiprocessing_mock)
 def test_compress_files_never_overwrite(fs):
     with open('/test.txt', 'wb') as file:
         file.write(b'a' * 100)
@@ -179,6 +192,7 @@ def test_compress_files_never_overwrite(fs):
     assert pathlib.Path('/test.txt.gz').stat().st_size == 0
 
 
+@patch('pelican_precompress.multiprocessing', multiprocessing_mock)
 def test_compress_files_overwrite(fs):
     with open('/test.txt', 'wb') as file:
         file.write(b'a' * 100)
@@ -198,6 +212,7 @@ def test_compress_files_overwrite(fs):
     assert pathlib.Path('/test.txt.gz').stat().st_size != 0
 
 
+@patch('pelican_precompress.multiprocessing', multiprocessing_mock)
 def test_compress_files_file_size_increase(fs):
     fs.create_file('/test.txt')
     instance = Mock()
@@ -213,6 +228,7 @@ def test_compress_files_file_size_increase(fs):
     assert not pathlib.Path('/test.txt.gz').exists()
 
 
+@patch('pelican_precompress.multiprocessing', multiprocessing_mock)
 def test_compress_files_success_all_algorithms(fs):
     pytest.importorskip('brotli')
     pytest.importorskip('zopfli')
