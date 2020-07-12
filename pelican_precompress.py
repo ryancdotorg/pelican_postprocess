@@ -172,7 +172,10 @@ def worker(data, path, compressor, settings):
             except OSError:
                 hash_dest = ''
         elif extension == '.br':
-            hash_dest = sha256(brotli.decompress(open(destination, 'rb').read()))
+            try:
+                hash_dest = sha256(brotli.decompress(open(destination, 'rb').read()))
+            except brotli.error:
+                hash_dest = ''
 
         if hash_orig == hash_dest:
             log.info(f'{destination} exists with correct data. Skipping.')

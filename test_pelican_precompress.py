@@ -7,6 +7,11 @@ import pathlib
 import time
 from unittest.mock import patch, Mock
 
+try:
+    import brotli
+except ImportError:
+    pass
+
 import pytest
 
 import pelican_precompress as pp
@@ -190,6 +195,28 @@ def test_compress_files_never_overwrite(fs):
     log.info.assert_called_once()
     assert pathlib.Path('/test.txt.gz').exists()
     assert pathlib.Path('/test.txt.gz').stat().st_size == 0
+
+
+@patch('pelican_precompress.multiprocessing', multiprocessing_mock)
+def test_compress_files_overwrite_br(fs):
+    pytest.importorskip('brotli')
+    with open('/test.txt', 'wb') as file:
+        file.write(b'a' * 100)
+    with open('/test.txt.br', 'wb') as file:
+        file.write(b'a')
+    instance = Mock()
+    instance.settings = {
+        'OUTPUT_PATH': '/',
+        'PRECOMPRESS_OVERWRITE': True,
+        'PRECOMPRESS_BROTLI': True,
+        'PRECOMPRESS_GZIP': False,
+        'PRECOMPRESS_ZOPFLI': False,
+    }
+    with patch('pelican_precompress.log', Mock()) as log:
+        pp.compress_files(instance)
+    log.warning.assert_called_once()
+    with pathlib.Path('/test.txt.br').open('rb') as file:
+        assert brotli.decompress(file.read()) == b'a' * 100
 
 
 @patch('pelican_precompress.multiprocessing', multiprocessing_mock)
