@@ -167,7 +167,10 @@ def worker(data, path, compressor, settings):
         # don't recompress if the input hasn't changed
         (hash_orig, hash_dest) = (sha256(data), None)
         if extension == '.gz':
-            hash_dest = sha256(gzip.open(destination).read())
+            try:
+                hash_dest = sha256(gzip.open(destination).read())
+            except OSError:
+                hash_dest = ''
         elif extension == '.br':
             hash_dest = sha256(brotli.decompress(open(destination, 'rb').read()))
 

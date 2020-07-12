@@ -193,10 +193,11 @@ def test_compress_files_never_overwrite(fs):
 
 
 @patch('pelican_precompress.multiprocessing', multiprocessing_mock)
-def test_compress_files_overwrite(fs):
+def test_compress_files_overwrite_gz(fs):
     with open('/test.txt', 'wb') as file:
         file.write(b'a' * 100)
-    fs.create_file('/test.txt.gz')
+    with open('/test.txt.gz', 'wb') as file:
+        file.write(b'a')
     instance = Mock()
     instance.settings = {
         'OUTPUT_PATH': '/',
@@ -208,8 +209,8 @@ def test_compress_files_overwrite(fs):
     with patch('pelican_precompress.log', Mock()) as log:
         pp.compress_files(instance)
     log.warning.assert_called_once()
-    assert pathlib.Path('/test.txt.gz').exists()
-    assert pathlib.Path('/test.txt.gz').stat().st_size != 0
+    with pathlib.Path('/test.txt.gz').open('rb') as file:
+        assert gzip.decompress(file.read()) == b'a' * 100
 
 
 @patch('pelican_precompress.multiprocessing', multiprocessing_mock)
