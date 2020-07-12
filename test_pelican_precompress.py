@@ -214,13 +214,15 @@ def test_compress_files_overwrite(fs):
 
 @patch('pelican_precompress.multiprocessing', multiprocessing_mock)
 def test_compress_files_file_size_increase(fs):
-    fs.create_file('/test.txt')
+    with open('/test.txt', 'wb') as file:
+        file.write(b'a' * 2)
     instance = Mock()
     instance.settings = {
         'OUTPUT_PATH': '/',
         'PRECOMPRESS_BROTLI': False,
         'PRECOMPRESS_GZIP': True,
         'PRECOMPRESS_ZOPFLI': False,
+        'PRECOMPRESS_MIN_SIZE': 1,
     }
     with patch('pelican_precompress.log', Mock()) as log:
         pp.compress_files(instance)

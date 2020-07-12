@@ -180,7 +180,7 @@ def worker(data, path, compressor, settings):
     try:
         blob = compress(data)
     except FileSizeIncrease:
-        log.warning(f'{name} compression caused "{path}" to become larger ({len(data)} vs {len(blob)}). Skipping.')
+        log.info(f'{name} compression caused "{path}" to become larger. Skipping.')
         return
 
     with destination.open('wb') as file:
