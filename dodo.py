@@ -67,7 +67,7 @@ def validate_in_git_master_branch():
     """Validate that the repository is in the git master branch."""
 
     branch = subprocess.check_output('git rev-parse --abbrev-ref HEAD', shell=True)
-    return branch.strip() == 'master'
+    return branch.decode('utf8', errors='ignore').strip() == 'master'
 
 
 def task_release():
