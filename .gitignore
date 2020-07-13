@@ -1,3 +1,13 @@
+# vim files
+*.swp
+
+# Built .rst->.html files
+*.html
+
+# doit database
+.doit.db
+
+
 # Python .gitignore, with .idea/ added.
 # https://github.com/github/gitignore/blob/master/Python.gitignore
 

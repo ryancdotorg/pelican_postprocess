@@ -2,6 +2,7 @@
 # Copyright 2019-2020 Kurt McKee <contactme@kurtmckee.org>
 # Released under the MIT license.
 
+import os
 import pathlib
 import setuptools
 
@@ -10,9 +11,17 @@ import pelican_precompress
 with pathlib.Path('README.rst').open('r') as file:
     long_description = file.read()
 
+name = 'pelican_precompress'
+if os.getenv('PRECOMPRESS_NAME_SUFFIX'):
+    name = f'pelican_precompress_{os.getenv("PRECOMPRESS_NAME_SUFFIX")}'
+
+version = pelican_precompress.__version__
+if os.getenv('PRECOMPRESS_VERSION_SUFFIX'):
+    version = f'{pelican_precompress.__version__}b{os.getenv("PRECOMPRESS_VERSION_SUFFIX")}'
+
 setuptools.setup(
-    name='pelican_precompress',
-    version=pelican_precompress.__version__,
+    name=name,
+    version=version,
     author='Kurt McKee',
     author_email='contactme@kurtmckee.org',
     description='Pre-compress your Pelican site using gzip, zopfli, and brotli!',
