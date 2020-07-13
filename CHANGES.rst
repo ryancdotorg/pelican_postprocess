@@ -10,6 +10,15 @@ Unreleased changes
 
 
 
+1.1.1
+=====
+
+*Released 13 July 2020*
+
+*   Fix a bytes/str oversight in the release process.
+
+
+
 1.1.0
 =====
 
