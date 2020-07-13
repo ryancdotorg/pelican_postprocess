@@ -10,7 +10,7 @@ import pathlib
 from typing import Dict, Iterable, Optional, Set, Union
 import zlib
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 
 log = logging.getLogger(__name__)
 
