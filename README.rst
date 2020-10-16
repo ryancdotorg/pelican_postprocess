@@ -5,7 +5,7 @@
 pelican_precompress
 *******************
 
-*Pre-compress your Pelican site using gzip, zopfli, and brotli!*
+*Minify HTML for your Pelican site and pre-compress using gzip, zopfli, and brotli!*
 
 ----
 
@@ -32,17 +32,19 @@ At minimum, you'll need to install the pelican_precompress plugin.
 It will automatically generate gzip files because gzip is built into the
 Python standard library.
 
-However, if you want highly-optimized gzip files you'll need the zopfli module.
-And if you want to have the very best compression currently available, you'll
-need to install the brotli module (which will require extra work in step 3).
+To minify your HTML before compression, the htmlmin module is required.
+If you want highly-optimized gzip files make sure you have the zopfli module.
+For the very best compression currently available, you'll need to install
+the brotli module (which will require extra work in step 3).
 
 ..  code-block:: shell-session
 
     $ pip install pelican_precompress
+    $ pip install htmlmin # This optimizes your HTML, but must be enabled.
     $ pip install zopfli  # This produces smaller gzip'd files. Use it!
     $ pip install brotli  # This requires extra work in step 3.
 
-Further reading: `zopfli`_, `brotli`_
+Further reading: `htmlmin`_, `zopfli`_, `brotli`_
 
 
 2. Configure Pelican
@@ -69,6 +71,13 @@ them alone because the defaults are awesome!
     #     '.css',
     #     '.html',
     #     '.but-the-default-extensions-are-pretty-comprehensive',
+    # }
+    #
+    # HTMLMIN_ENABLED = True or False
+    # HTMLMIN_EXTENSIONS = {'.html', '.htm', }
+    # HTMLMIN_OPTIONS = {
+    #     'remove_comments': True,
+    #     'remove_empty_space': True,
     # }
 
 Further reading: `Pelican plugins`_
@@ -150,6 +159,28 @@ You set them in your Pelican configuration file.
 
     To try compressing every file regardless of size, set this to ``0``.
 
+*   ``HTMLMIN_ENABLED`` (bool, default is False)
+
+    Minifies HTML using htmlmin.
+    You might set this to ``False`` during development.
+    As with ``PRECOMPRESS_ZOPFLI`` and ``PRECOMPRESS_BROTLI``, if the htmlmin
+    module isn't installed then nothing will happen.
+
+*   ``HTMLMIN_EXTENSIONS`` (Set[str], defaults to {'.html', '.htm'})
+
+    This setting controls which file extensions will be minified.
+
+    If you modify this setting in the Pelican configuration file it will
+    completely replace the default extensions!
+
+*   ``HTMLMIN_OPTIONS`` (dict)
+
+    This setting controls the options passed to the ``htmlmin.minify``
+    function. The only deviations from htmlmin's defaults are that
+    ``remove_optional_attribute_quotes`` is ``False`` and ``code`` has been
+    added to ``pre_tags``.
+
+Further reading: `htmlmin API reference`_
 
 Testing
 =======
@@ -178,6 +209,8 @@ Further reading: `tox`_, `venv`_, `pytest`_, `pyfakefs`_, `coverage`_
 
 ..  _Pelican: https://getpelican.com/
 ..  _Pelican plugins: https://docs.getpelican.com/en/latest/plugins.html
+..  _htmlmin: https://htmlmin.readthedocs.io/en/latest/
+..  _htmlmin API reference: https://htmlmin.readthedocs.io/en/latest/reference.html
 ..  _zopfli: https://pypi.org/project/zopfli/
 ..  _brotli: https://pypi.org/project/Brotli/
 ..  _gzip_static: https://nginx.org/en/docs/http/ngx_http_gzip_static_module.html#gzip_static
