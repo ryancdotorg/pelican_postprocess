@@ -14,6 +14,7 @@ Unreleased changes
 ==================
 
 *   Prevent small files from terminating the file compression loop. (#5)
+*   Officially support Python 3.9.
 
 
 
