@@ -1,5 +1,5 @@
 # This file is part of the pelican-precompress plugin.
-# Copyright 2019-2020 Kurt McKee <contactme@kurtmckee.org>
+# Copyright 2019-2021 Kurt McKee <contactme@kurtmckee.org>
 # Released under the MIT license.
 
 # The tasks defined in this file automates the entire
