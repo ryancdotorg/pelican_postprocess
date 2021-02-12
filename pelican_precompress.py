@@ -148,7 +148,7 @@ def compress_files(instance):
         # Ignore files smaller than the minimum size.
         if minimum_size and path.stat().st_size < minimum_size:
             log.info(f'{path} is less than {minimum_size} bytes. Skipping.')
-            return
+            continue
 
         data = path.read_bytes()
 
