@@ -8,6 +8,8 @@ Changelog
 Unreleased changes
 ==================
 
+*   Prevent small files from terminating the file compression loop. (#5)
+
 
 
 1.1.1
