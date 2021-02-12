@@ -1,16 +1,11 @@
 # This file is part of the pelican-precompress plugin.
-# Copyright 2019-2020 Kurt McKee <contactme@kurtmckee.org>
+# Copyright 2019-2021 Kurt McKee <contactme@kurtmckee.org>
 # Released under the MIT license.
 
 import gzip
 import pathlib
 import time
 from unittest.mock import patch, Mock
-
-try:
-    import brotli
-except ImportError:
-    pass
 
 import pytest
 
@@ -145,11 +140,18 @@ def test_register():
     pelican.signals.finalized.connect.assert_called_once_with(pp.compress_files)
 
 
-def test_copyrights():
-    for pattern in ('*.py', '*.rst', '*.ini'):
-        for path in pathlib.Path(__file__).parent.glob(pattern):
-            with path.open('r') as file:
-                assert f'2019-{time.gmtime().tm_year}' in file.read(100), f'{path.name} has an incorrect copyright date'
+copyrighted_files = [
+    *list(pathlib.Path(__file__).parent.glob('*.ini')),
+    *list(pathlib.Path(__file__).parent.glob('*.py')),
+    *list(pathlib.Path(__file__).parent.glob('*.rst')),
+    *list(pathlib.Path(__file__).parent.glob('*.txt')),
+]
+
+
+@pytest.mark.parametrize('path', copyrighted_files)
+def test_copyrights(path):
+    with path.open('r') as file:
+        assert f'2019-{time.gmtime().tm_year}' in file.read(100), f'{path.name} has an incorrect copyright date'
 
 
 def apply_async_mock(fn, args, *extra_args, **kwargs):
@@ -224,7 +226,7 @@ def test_compress_files_skip_existing_matching_files(fs):
 
 @patch('pelican_precompress.multiprocessing', multiprocessing_mock)
 def test_compress_files_overwrite_br(fs):
-    pytest.importorskip('brotli')
+    brotli = pytest.importorskip('brotli')
     with open('/test.txt', 'wb') as file:
         file.write(b'a' * 100)
     with open('/test.txt.br', 'wb') as file:
@@ -281,6 +283,31 @@ def test_compress_files_file_size_increase(fs):
         pp.compress_files(instance)
     log.info.assert_called_once()
     assert not pathlib.Path('/test.txt.gz').exists()
+
+
+@patch('pelican_precompress.multiprocessing', multiprocessing_mock)
+def test_compress_files_continue_on_small_files(fs):
+    """Verify that small files do not cause an early exit.
+
+    This was incorrect behavior was reported in issue #5.
+    """
+
+    with open('/000-too-small.txt', 'wb') as file:
+        file.write(b'a')
+    with open('/999-must-compress.txt', 'wb') as file:
+        file.write(b'a' * 100)
+    instance = Mock()
+    instance.settings = {
+        'OUTPUT_PATH': '/',
+        'PRECOMPRESS_BROTLI': False,
+        'PRECOMPRESS_GZIP': True,
+        'PRECOMPRESS_ZOPFLI': False,
+        'PRECOMPRESS_MIN_SIZE': 100,
+    }
+    with patch('pelican_precompress.log', Mock()) as log:
+        pp.compress_files(instance)
+    log.info.assert_called_once()
+    assert pathlib.Path('/999-must-compress.txt.gz').exists()
 
 
 @patch('pelican_precompress.multiprocessing', multiprocessing_mock)

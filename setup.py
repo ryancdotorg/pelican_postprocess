@@ -1,5 +1,5 @@
 # This file is part of the pelican-precompress plugin.
-# Copyright 2019-2020 Kurt McKee <contactme@kurtmckee.org>
+# Copyright 2019-2021 Kurt McKee <contactme@kurtmckee.org>
 # Released under the MIT license.
 
 import os
@@ -37,6 +37,7 @@ setuptools.setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Topic :: Internet :: WWW/HTTP :: Site Management',
     ],
     python_requires='~=3.6',

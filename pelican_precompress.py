@@ -1,5 +1,5 @@
 # This file is part of the pelican-precompress plugin.
-# Copyright 2019-2020 Kurt McKee <contactme@kurtmckee.org>
+# Copyright 2019-2021 Kurt McKee <contactme@kurtmckee.org>
 # Released under the MIT license.
 
 import functools
@@ -10,7 +10,7 @@ import pathlib
 from typing import Dict, Iterable, Optional, Set, Union
 import zlib
 
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 
 log = logging.getLogger(__name__)
 
@@ -148,7 +148,7 @@ def compress_files(instance):
         # Ignore files smaller than the minimum size.
         if minimum_size and path.stat().st_size < minimum_size:
             log.info(f'{path} is less than {minimum_size} bytes. Skipping.')
-            return
+            continue
 
         data = path.read_bytes()
 
