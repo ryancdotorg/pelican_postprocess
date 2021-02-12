@@ -286,6 +286,31 @@ def test_compress_files_file_size_increase(fs):
 
 
 @patch('pelican_precompress.multiprocessing', multiprocessing_mock)
+def test_compress_files_continue_on_small_files(fs):
+    """Verify that small files do not cause an early exit.
+
+    This was incorrect behavior was reported in issue #5.
+    """
+
+    with open('/000-too-small.txt', 'wb') as file:
+        file.write(b'a')
+    with open('/999-must-compress.txt', 'wb') as file:
+        file.write(b'a' * 100)
+    instance = Mock()
+    instance.settings = {
+        'OUTPUT_PATH': '/',
+        'PRECOMPRESS_BROTLI': False,
+        'PRECOMPRESS_GZIP': True,
+        'PRECOMPRESS_ZOPFLI': False,
+        'PRECOMPRESS_MIN_SIZE': 100,
+    }
+    with patch('pelican_precompress.log', Mock()) as log:
+        pp.compress_files(instance)
+    log.info.assert_called_once()
+    assert pathlib.Path('/999-must-compress.txt.gz').exists()
+
+
+@patch('pelican_precompress.multiprocessing', multiprocessing_mock)
 def test_compress_files_overwrite_erase_existing_file(fs):
     """Ensure existing files are erased if the file size would increase."""
     with open('/test.txt', 'wb') as file:
