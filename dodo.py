@@ -1,4 +1,4 @@
-# This file is part of the pelican-precompress plugin.
+# This file is part of the pelican-postprocess plugin.
 # Copyright 2019-2021 Kurt McKee <contactme@kurtmckee.org>
 # Released under the MIT license.
 
@@ -38,8 +38,8 @@ def task_test():
         'verbosity': 2,
         'file_dep': [
             'setup.py',
-            'pelican_precompress.py',
-            'test_pelican_precompress.py',
+            'pelican_postprocess.py',
+            'test_pelican_postprocess.py',
         ],
     }
 
@@ -55,7 +55,7 @@ def task_test_release():
             'rm dist/*',
             f'PRECOMPRESS_NAME_SUFFIX={name_suffix} PRECOMPRESS_VERSION_SUFFIX={version_suffix} python setup.py sdist bdist_wheel',
             f'twine upload --repository testpypi dist/*{name_suffix}*',
-            f'xdg-open https://test.pypi.org/project/pelican_precompress_{name_suffix}',
+            f'xdg-open https://test.pypi.org/project/pelican_postprocess_{name_suffix}',
         ],
         'verbosity': 2,
     }
@@ -81,7 +81,7 @@ def task_release():
             'rm dist/*',
             f'python setup.py sdist bdist_wheel',
             f'twine upload dist/*',
-            f'xdg-open https://pypi.org/project/pelican_precompress',
+            f'xdg-open https://pypi.org/project/pelican_postprocess',
         ],
         'verbosity': 2,
     }

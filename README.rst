@@ -1,9 +1,13 @@
-..  This file is part of the pelican_precompress plugin.
+..  This file is part of the pelican_postprocess plugin.
 ..  Copyright 2019-2021 Kurt McKee <contactme@kurtmckee.org>
 ..  Released under the MIT license.
 
-pelican_precompress
+pelican_postprocess
 *******************
+
+**NOTE: This is a fork of Kurt McKee’s pelican_precompress plugin which adds
+support for running files through htmlmin prior to compression. The
+documentation is not fully updated.**
 
 *Pre-compress your Pelican site using gzip, zopfli, and brotli!*
 
@@ -11,7 +15,7 @@ pelican_precompress
 
 Are you using `Pelican`_, the static site generator? If so, great!
 Are you pre-compressing your static files to have the fastest site possible?
-If not, install **pelican_precompress** today!
+If not, install **pelican_postprocess** today!
 It's the plugin that makes your visitors happy and saves you money!
 
 
@@ -21,14 +25,14 @@ Installation
 There are three steps required to start using static compression:
 
 #.  Install the plugin and any supporting Python packages you want.
-#.  Configure Pelican to use the pelican_precompress plugin.
+#.  Configure Pelican to use the pelican_postprocess plugin.
 #.  Configure your web server to use static, pre-compressed files.
 
 
 1. Install the Python modules
 -----------------------------
 
-At minimum, you'll need to install the pelican_precompress plugin.
+At minimum, you'll need to install the pelican_postprocess plugin.
 It will automatically generate gzip files because gzip is built into the
 Python standard library.
 
@@ -38,7 +42,7 @@ need to install the brotli module (which will require extra work in step 3).
 
 ..  code-block:: shell-session
 
-    $ pip install pelican_precompress
+    $ ~~pip install pelican_postprocess~~
     $ pip install zopfli  # This produces smaller gzip'd files. Use it!
     $ pip install brotli  # This requires extra work in step 3.
 
@@ -55,9 +59,7 @@ them alone because the defaults are awesome!
 
 ..  code-block:: python3
 
-    import pelican_precompress
-
-    PLUGINS = [pelican_precompress]
+    PLUGINS = [pelican_postprocess]
 
     # PRECOMPRESS_GZIP = True or False
     # PRECOMPRESS_ZOPFLI = True or False
@@ -130,7 +132,7 @@ You set them in your Pelican configuration file.
 
 *   ``PRECOMPRESS_OVERWRITE`` (bool, default is False)
 
-    When pelican_precompress encounters an existing compressed file
+    When pelican_postprocess encounters an existing compressed file
     it will refuse to overwrite it. If you want the plugin to overwrite
     files you can set this to ``True``.
 
@@ -154,7 +156,7 @@ You set them in your Pelican configuration file.
 Testing
 =======
 
-**pelican_precompress** has 100% test coverage. If you'd like to test the
+**pelican_postprocess** has XXX% test coverage. If you'd like to test the
 code yourself, clone the git repository and run these commands:
 
 ..  code-block:: shell

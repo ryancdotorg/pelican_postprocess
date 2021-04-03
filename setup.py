@@ -1,34 +1,25 @@
-# This file is part of the pelican-precompress plugin.
+# This file is part of the pelican-postprocess plugin.
 # Copyright 2019-2021 Kurt McKee <contactme@kurtmckee.org>
 # Released under the MIT license.
 
-import os
 import pathlib
 import setuptools
 
-import pelican_precompress
+import pelican_postprocess
 
 with pathlib.Path('README.rst').open('r') as file:
     long_description = file.read()
 
-name = 'pelican_precompress'
-if os.getenv('PRECOMPRESS_NAME_SUFFIX'):
-    name = f'pelican_precompress_{os.getenv("PRECOMPRESS_NAME_SUFFIX")}'
-
-version = pelican_precompress.__version__
-if os.getenv('PRECOMPRESS_VERSION_SUFFIX'):
-    version = f'{pelican_precompress.__version__}b{os.getenv("PRECOMPRESS_VERSION_SUFFIX")}'
-
 setuptools.setup(
-    name=name,
-    version=version,
+    name='pelican_postprocess',
+    version=pelican_postprocess.__version__,
     author='Kurt McKee',
     author_email='contactme@kurtmckee.org',
     description='Pre-compress your Pelican site using gzip, zopfli, and brotli!',
     long_description=long_description,
     long_description_content_type='text/x-rst',
     url='https://github.com/kurtmckee/pelican_precompress',
-    py_modules=['pelican_precompress'],
+    py_modules=['pelican_postprocess'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Framework :: Pelican :: Plugins',
@@ -37,7 +28,6 @@ setuptools.setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
         'Topic :: Internet :: WWW/HTTP :: Site Management',
     ],
     python_requires='~=3.6',

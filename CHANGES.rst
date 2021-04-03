@@ -1,4 +1,4 @@
-..  This file is part of the pelican_precompress plugin.
+..  This file is part of the pelican_postprocess plugin.
 ..  Copyright 2019-2021 Kurt McKee <contactme@kurtmckee.org>
 ..  Released under the MIT license.
 
